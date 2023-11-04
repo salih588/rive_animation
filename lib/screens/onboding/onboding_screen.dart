@@ -1,9 +1,10 @@
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:rive/rive.dart';
+
+import 'components/animated_btn.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -17,7 +18,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   void initState() {
-    _btnAnimationController = OneShotAnimation('active');
+    _btnAnimationController = OneShotAnimation('active', autoplay: false);
     super.initState();
   }
 
@@ -42,12 +43,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: const SizedBox(),
             ),
           ),
-          const SafeArea(
+          SafeArea(
               child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 32.0),
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
+                const Spacer(),
+                const SizedBox(
                   width: 260,
                   child: Column(
                     children: [
@@ -65,28 +68,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: 64,
-                  width: 260,
-                  child: Stack(
-                    children: [
-                      RiveAnimation.asset('assets/RiveAssets/button.riv'),
-                      Positioned.fill(
-                        top: 8,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(CupertinoIcons.arrow_right),
-                            Gap(8),
-                            Text(
-                              'Start the course',
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                const Spacer(flex: 2,),
+                AnimatedBtn(
+                  btnAnimationController: _btnAnimationController,
+                  press: () {
+                    _btnAnimationController.isActive = true;
+                  },
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20.0),
+                  child: Text('Purchase includes access to 30+ courses, 240+ premium tutorials, 120+ hours of videos, source files and certificates.'),
                 ),
               ],
             ),
