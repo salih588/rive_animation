@@ -25,6 +25,7 @@ Future<Object?> customSigninDialog(BuildContext context, {required ValueChanged 
               color: Colors.white.withOpacity(0.94),
               borderRadius: const BorderRadius.all(Radius.circular(40))),
           child: Scaffold(
+            resizeToAvoidBottomInset: false,
             backgroundColor: Colors.transparent,
             body: Stack(
               clipBehavior: Clip.none,

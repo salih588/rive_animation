@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:rive/rive.dart';
+import 'package:rive_animation/entry_point.dart';
+import 'package:rive_animation/utils/rive_utils.dart';
 
 class SignInForm extends StatefulWidget {
   const SignInForm({
@@ -13,19 +15,44 @@ class SignInForm extends StatefulWidget {
 }
 
 class _SignInFormState extends State<SignInForm> {
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool isShowLoading = false;
+  bool isShowConfetti = false;
 
   late SMITrigger check;
   late SMITrigger error;
   late SMITrigger reset;
 
-  StateMachineController getRiveController(Artboard artboard){
-    StateMachineController? controller = StateMachineController.fromArtboard(artboard, 'State Machine 1');
-    artboard.addController(controller!);
-    return controller;
+  late SMITrigger confetti;
+
+  void signIn(BuildContext context) {
+    setState(() {
+      isShowLoading = true;
+      isShowConfetti = true;
+    });
+    Future.delayed(const Duration(seconds: 1), () {
+      if (_formKey.currentState!.validate()) {
+        check.fire();
+        Future.delayed(const Duration(seconds: 2), () {
+          setState(() {
+            isShowLoading = false;
+          });
+          confetti.fire();
+          Future.delayed(const Duration(seconds: 1), () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const EntryPoint()));
+          });
+        });
+      } else {
+        error.fire();
+        Future.delayed(const Duration(seconds: 2), () {
+          setState(() {
+            isShowLoading = false;
+          });
+        });
+      }
+    });
   }
 
   @override
@@ -33,7 +60,7 @@ class _SignInFormState extends State<SignInForm> {
     return Stack(
       children: [
         Form(
-          key: _formKey,
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -44,18 +71,18 @@ class _SignInFormState extends State<SignInForm> {
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
                   child: TextFormField(
-                    validator: (value){
-                      if(value!.isEmpty){
+                    validator: (value) {
+                      if (value!.isEmpty) {
                         return '';
                       }
                       return null;
                     },
-                    onSaved: (email){},
+                    onSaved: (email) {},
                     decoration: InputDecoration(
                         prefixIcon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: SvgPicture.asset('assets/icons/email.svg'),
-                        )),
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: SvgPicture.asset('assets/icons/email.svg'),
+                    )),
                   ),
                 ),
                 const Text(
@@ -66,67 +93,102 @@ class _SignInFormState extends State<SignInForm> {
                   padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
                   child: TextFormField(
                     obscureText: true,
-                    validator: (value){
-                      if(value!.isEmpty){
+                    validator: (value) {
+                      if (value!.isEmpty) {
                         return '';
                       }
                       return null;
                     },
-                    onSaved: (password){},
+                    onSaved: (password) {},
                     decoration: InputDecoration(
                         prefixIcon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: SvgPicture.asset('assets/icons/email.svg'),
-                        )),
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: SvgPicture.asset('assets/icons/email.svg'),
+                    )),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
                   child: ElevatedButton.icon(
-                      onPressed: (){
-                        setState(() {
-                          isShowLoading = true;
-                        });
-                        if(_formKey.currentState!.validate()){
-
-                        }else{
-
-                        }
+                      onPressed: () {
+                        signIn(context);
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xfff77D8e),
                           minimumSize: const Size(double.infinity, 56),
                           shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(25),
-                                bottomLeft: Radius.circular(25),
-                                bottomRight: Radius.circular(25),
-                              )
-                          )
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(25),
+                            bottomLeft: Radius.circular(25),
+                            bottomRight: Radius.circular(25),
+                          ))),
+                      icon: const Icon(
+                        CupertinoIcons.arrow_right,
+                        color: Color(0xfffe0037),
                       ),
-                      icon: const Icon(CupertinoIcons.arrow_right, color: Color(0xfffe0037),), label: const Text('Sign In')),
+                      label: const Text('Sign In')),
                 )
               ],
             )),
-        isShowLoading ? Positioned.fill(child: Column(
-          children: [
-            const Spacer(),
-            SizedBox(
-              height: 100,
-              width: 100,
-              child: RiveAnimation.asset('assets/RiveAssets/check.riv',
-                onInit: (artBoard){
-                StateMachineController controller = getRiveController(artBoard);
-                check = controller.findSMI("check") as SMITrigger;
-                error = controller.findSMI('error') as SMITrigger;
-                reset = controller.findSMI('reset') as SMITrigger;
-              },),
-            ),
-            const Spacer(),
-          ],
-        ),) : const SizedBox()
+        isShowLoading
+            ? CustomPositioned(
+                child: RiveAnimation.asset(
+                  'assets/RiveAssets/check.riv',
+                  onInit: (artBoard) {
+                    StateMachineController controller =
+                        RiveUtils.getRiveController(artBoard);
+                    check = controller.findSMI("Check") as SMITrigger;
+                    error = controller.findSMI('Error') as SMITrigger;
+                    reset = controller.findSMI('Reset') as SMITrigger;
+                  },
+                ),
+              )
+            : const SizedBox(),
+        isShowConfetti
+            ? CustomPositioned(
+                child: Transform.scale(
+                  scale: 7,
+                  child: RiveAnimation.asset(
+                    'assets/RiveAssets/confetti.riv',
+                    onInit: (artBoard) {
+                      StateMachineController controller =
+                      RiveUtils.getRiveController(artBoard);
+                      confetti =
+                          controller.findSMI("Trigger explosion") as SMITrigger;
+                    },
+                  ),
+                ),
+              )
+            : const SizedBox()
       ],
+    );
+  }
+}
+
+class CustomPositioned extends StatelessWidget {
+  const CustomPositioned({Key? key, required this.child, this.size = 100})
+      : super(key: key);
+
+  final Widget child;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: Column(
+        children: [
+          const Spacer(),
+          SizedBox(
+            height: size,
+            width: size,
+            child: child,
+          ),
+          const Spacer(
+            flex: 2,
+          ),
+        ],
+      ),
     );
   }
 }
