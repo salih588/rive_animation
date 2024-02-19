@@ -127,7 +127,7 @@ class _SignInFormState extends State<SignInForm> {
                         CupertinoIcons.arrow_right,
                         color: Color(0xfffe0037),
                       ),
-                      label: const Text('Sign In')),
+                      label: const Text('Sign In', style: TextStyle(color: Colors.white),)),
                 )
               ],
             )),

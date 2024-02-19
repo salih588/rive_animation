@@ -15,7 +15,7 @@ Future<Object?> customSigninDialog(BuildContext context, {required ValueChanged 
       },
       pageBuilder: (context, _, __) => Center(
         child: Container(
-          height: 620,
+          height: 660,
           margin: const EdgeInsets.symmetric(
             horizontal: 16,
           ),
