@@ -65,6 +65,39 @@ class _SideMenuState extends State<SideMenu> {
                     },
                     isActive: selectedMenu == menu,
                   )),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 24.0,
+                  top: 32.0,
+                  bottom: 16.0,
+                ),
+                child: Text(
+                  "History".toUpperCase(),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(color: Colors.white70),
+                ),
+              ),
+              ...sideMenu2.map((menu) => SideMenuTile(
+                menu: menu,
+                riveonInit: (artBoard) {
+                  StateMachineController controller =
+                  RiveUtils.getRiveController(artBoard,
+                      stateMachineName: menu.stateMachineName);
+                  menu.input = controller.findSMI("active") as SMIBool;
+                },
+                press: () {
+                  menu.input!.change(true);
+                  Future.delayed(const Duration(seconds: 1), (){
+                    menu.input!.change(false);
+                  });
+                  setState(() {
+                    selectedMenu = menu;
+                  });
+                },
+                isActive: selectedMenu == menu,
+              )),
             ],
           ),
         ),
