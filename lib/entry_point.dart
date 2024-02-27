@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
+import 'package:rive_animation/components/menu_btn.dart';
 import 'package:rive_animation/constants.dart';
 import 'package:rive_animation/screens/home/home_screen.dart';
 import 'package:rive_animation/utils/rive_utils.dart';
@@ -17,6 +18,7 @@ class EntryPoint extends StatefulWidget {
 
 class _EntryPointState extends State<EntryPoint> {
   RiveAsset selectedBottomNav = bottomNavs.first;
+  late SMIBool isSideBarClosed;
 
   @override
   Widget build(BuildContext context) {
@@ -26,22 +28,17 @@ class _EntryPointState extends State<EntryPoint> {
       body: Stack(
         children: [
           const HomeScreen(),
-          SafeArea(
-            child: Container(
-              height: 40,
-              width: 40,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(0, 3),
-                  blurRadius: 8,
-                )]
-              ),
-              child: RiveAnimation.asset("assets/RiveAssets/menu_button.riv"),
-            ),
+          MenuBtn(
+            riveOnInit: (artBoard){
+              StateMachineController controller = RiveUtils.getRiveController(
+                artBoard,
+                stateMachineName: "State Machine");
+              isSideBarClosed = controller.findSMI("isOpen") as SMIBool;
+              isSideBarClosed.value = true;
+            },
+            press: (){
+              isSideBarClosed.value = !isSideBarClosed.value;
+            },
           ),
         ],
       ),
@@ -105,3 +102,5 @@ class _EntryPointState extends State<EntryPoint> {
     );
   }
 }
+
+
