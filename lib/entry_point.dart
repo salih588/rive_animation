@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:rive/rive.dart';
 import 'package:rive_animation/components/menu_btn.dart';
+import 'package:rive_animation/components/side_menu.dart';
 import 'package:rive_animation/constants.dart';
 import 'package:rive_animation/screens/home/home_screen.dart';
 import 'package:rive_animation/utils/rive_utils.dart';
@@ -18,16 +20,41 @@ class EntryPoint extends StatefulWidget {
 
 class _EntryPointState extends State<EntryPoint> {
   RiveAsset selectedBottomNav = bottomNavs.first;
+
+  late AnimationController _animationController;
+  late Animation animation;
+
   late SMIBool isSideBarClosed;
+  bool isSideMenuClosed = true;
+
+  @override
+  void initState() {
+    // _animationController =
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor2,
       resizeToAvoidBottomInset: false,
       extendBody: true,
       body: Stack(
         children: [
-          const HomeScreen(),
+          AnimatedPositioned(
+            duration: Duration(milliseconds: 200),
+              curve: Curves.fastOutSlowIn,
+              width: 288,
+              left: isSideMenuClosed ? -288 : 0,
+              height: MediaQuery.of(context).size.height,
+              child: SideMenu(),),
+          Transform.translate(
+            offset: Offset(isSideMenuClosed ? 0 : 288, 0),
+              child: Transform.scale(
+                scale: isSideMenuClosed ? 1 : 0.8,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(isSideMenuClosed? 0 : 24)),
+                      child: const HomeScreen()))),
           MenuBtn(
             riveOnInit: (artBoard){
               StateMachineController controller = RiveUtils.getRiveController(
@@ -38,6 +65,9 @@ class _EntryPointState extends State<EntryPoint> {
             },
             press: (){
               isSideBarClosed.value = !isSideBarClosed.value;
+              setState(() {
+                isSideMenuClosed = isSideBarClosed.value;
+              });
             },
           ),
         ],
